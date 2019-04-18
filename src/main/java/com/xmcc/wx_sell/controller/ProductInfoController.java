@@ -17,7 +17,7 @@ public class ProductInfoController {
     @Autowired
     private ProductInfoService productInfoService;
 
-    @GetMapping("/list")
+    @RequestMapping("/list")
     @ApiOperation(value = "查询商品列表")
     public ResultResponse list(){
         return productInfoService.queryList();

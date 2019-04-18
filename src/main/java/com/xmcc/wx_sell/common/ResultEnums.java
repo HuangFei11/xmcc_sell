@@ -12,6 +12,7 @@ public enum ResultEnums {
     PARAM_ERROR(1,"参数异常"),
     NOT_EXITS(1,"商品不存在");
 
+
     private int code;
     private String msg;
 

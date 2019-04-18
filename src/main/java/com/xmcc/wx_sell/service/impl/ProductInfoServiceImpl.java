@@ -1,5 +1,6 @@
 package com.xmcc.wx_sell.service.impl;
 
+import com.xmcc.wx_sell.common.ProductEnums;
 import com.xmcc.wx_sell.common.ResultEnums;
 import com.xmcc.wx_sell.common.ResultResponse;
 import com.xmcc.wx_sell.dto.ProductCategoryDto;
@@ -9,11 +10,13 @@ import com.xmcc.wx_sell.entity.ProductInfo;
 import com.xmcc.wx_sell.repository.ProductCategoryRepository;
 import com.xmcc.wx_sell.repository.ProductInfoRepository;
 import com.xmcc.wx_sell.service.ProductInfoService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 @Service
 public class ProductInfoServiceImpl implements ProductInfoService {
@@ -49,6 +52,29 @@ public class ProductInfoServiceImpl implements ProductInfoService {
             return productCategoryDto;
         }).collect(Collectors.toList());
         return ResultResponse.success(productCategoryDtos);
+    }
+
+    @Override
+    public ResultResponse<ProductInfo> queryById(String productId) {
+        //使用common-lang3 jar的类 没导入自己导入一下
+        if(StringUtils.isBlank(productId)){
+            return ResultResponse.fail(ResultEnums.PARAM_ERROR.getMsg()+":"+productId);
+        }
+        Optional<ProductInfo> byId = productInfoRepository.findById(productId);
+        if(!byId.isPresent()){
+            return ResultResponse.fail(productId+":"+ResultEnums.NOT_EXITS.getMsg());
+        }
+        ProductInfo productInfo = byId.get();
+        //判断商品是否下架
+        if(productInfo.getProductStatus()==ProductEnums.PRODUCT_DOWN.getCode()){
+            return ResultResponse.fail(ProductEnums.PRODUCT_DOWN.getMsg());
+        }
+        return ResultResponse.success(productInfo);
+    }
+
+    @Override
+    public void updateProduct(ProductInfo productInfo) {
+        productInfoRepository.save(productInfo);
     }
 }
 
